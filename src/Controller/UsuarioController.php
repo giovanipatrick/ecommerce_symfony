@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Usuarios;
+use App\Repository\UsuariosRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,21 +12,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Exception;
 use stdClass;
 
-
-/** 
- * Classe responsável pela manipulação dos usuários
- * @author Giovani Patrick <giovani@diminua.me>
- * @package Ecommerce
- * @version 1.0
- */
 class UsuarioController extends AbstractController{
 
     /** 
      * Trata os dados e gera uma Exception caso os critérios não sejam atendidos
-     * @param Request $request
-     * @param boolean $update True para dados específicos a rota Update
-     * @throws Exception
-     * @return void
      */
     private function validateCreateAndUpdateParams($request,$update)
     {
@@ -60,8 +52,6 @@ class UsuarioController extends AbstractController{
 
     /** 
      * Cria um objeto com os dados enviados no Body da requisição e o retorna
-     * @param Request $request 
-     * @return stdClass
      */
     private function reqParams($request)
     {
@@ -76,107 +66,231 @@ class UsuarioController extends AbstractController{
     }
 
     /**
-     * Autenticação do Usuário
      * @Route("/usuario/authenticate", name="app_usuario_authenticate", methods="POST")
-     * @param Request $request
-     * @throws Exception
-     * @return string JSON
      */
-    public function authUser(Request $request) : Response
+    public function authUser(UsuariosRepository $userRepo, Request $request) : Response
     {
         try{
             if($request->get('email')){
                 if($request->get('password')){
-                    return $this->json(
-                        array("code"=>200,"type"=>"success","message"=>"Usuário autenticado"),
-                    200);
+                    $usuario = $userRepo->findByEmailAndPassword($request->get('email'),md5($request->get('password')));
+                        if(!$usuario){
+                            return $this->json(
+                                array("code"=>400,"type"=>"error","message"=>"Usuário ou senha incorreto(a)s"),
+                                400
+                            );
+                        }else{
+                            return $this->json(
+                                array("code"=>200,"type"=>"success","message"=>"Usuário autenticado!"),
+                                200
+                            );
+                        }
                 }else{
-                    throw new Exception('A senha não foi informada!');
+                    return $this->json(
+                        array("code"=>400,"type"=>"error","message"=>"A senha não foi informada"),
+                        400
+                    );
                 }
             }else{
-                throw new Exception('O email não foi informado!');
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O email não foi informado"),
+                    400
+                );
             }
         }catch(Exception $e){
-            return $this->json(array("code"=>400,"type"=>"error","message"=>$e->getMessage()));
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
         }
     }
 
     /**
-     * Criar Usuário
      * @Route("/usuario/create", name="app_usuario_create", methods="POST")
-     * @param Request $request
-     * @return string JSON
      */
-    public function createUser(Request $request) : Response
+    public function createUser(UsuariosRepository $userRepo,Request $request) : Response
     {
         try{
+
             $this->validateCreateAndUpdateParams($request,false);
             $values = $this->reqParams($request);
-            return $this->json(array("code"=>200,"type"=>"success","message"=>$values));
+            
+            $userEnt = new Usuarios;
+            $userEnt->setNome($values->nome);
+            $userEnt->setSobrenome($values->sobrenome);
+            $userEnt->setEmail($values->email);
+            $userEnt->setPassword($values->password);
+            $userEnt->setGrupo($values->grupo);
+            $userEnt->setRemoved(0);
+            $userEnt->setCreatedAt(new \DateTime());
+
+            if(!$userRepo->findByEmail($userEnt->getEmail())){
+                $userRepo->add($userEnt,true);
+                return $this->json(
+                    array("code"=>200,"type"=>"success","message"=>"Usuário cadastrado com sucesso!"),
+                    200
+                );
+            }else{
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"Usuário já cadastrado!"),
+                    400
+                );
+            }
+
         }catch(Exception $e){
-            return $this->json(array("code"=>400,"type"=>"error","message"=>$e->getMessage()));
+            return $this->json(
+                array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
         }
     }
 
     /** 
-     * Atualizar Usuário
      * @Route("/usuario/update", name="app_usuario_update", methods="PUT")
-     * @param Request $request
-     * @return string JSON
      */
-    public function updateUser(Request $request) : Response
+    public function updateUser(EntityManagerInterface $em, UsuariosRepository $userRepo, Request $request) : Response
     {
         try{
+
             $this->validateCreateAndUpdateParams($request,true);
             $values = $this->reqParams($request);
-            return $this->json(array("code"=>200,"type"=>"success","message"=>$values));
+
+            $usuario = $userRepo->find($values->id);
+
+            if(!$usuario){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O usuário não foi encontrado!"),
+                    400
+                );
+            }
+
+            $usuario->setNome($values->nome);
+            $usuario->setSobrenome($values->sobrenome);
+            $usuario->setEmail($values->email);
+            $usuario->setGrupo($values->grupo);
+            $usuario->setUpdatedAt(new \DateTime());
+
+            $em->flush();
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>"O usuário foi atualizado com sucesso!"),
+                200
+            );
+
         }catch(Exception $e){
-            return $this->json(array("code"=>400,"type"=>"error","message"=>$e->getMessage()));
+            return $this->json(
+                array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
         }
     }
 
     /** 
-     * Desabilitar Usuário
      * @Route("/usuario/inactivate/{id}", name="app_usuario_inactivate", methods="DELETE")
-     * @param Request $request
-     * @return string JSON
      */
-    public function inactivateUser($id = null, Request $request) : Response
+    public function inactivateUser($id = null, EntityManagerInterface $em, UsuariosRepository $userRepo, Request $request) : Response
     {
-        if(intval($id)){
+        try{
 
-        }else{
+            if(intval($id)){
+
+                $usuario = $userRepo->find($id);
+    
+                if(!$usuario){
+                    return $this->json(
+                        array("code"=>400,"type"=>"error","message"=>"O usuário não foi encontrado!"),
+                        400
+                    );
+                }
+    
+                $usuario->setRemoved(1);
+                $usuario->setUpdatedAt(new \DateTime());
+    
+                $em->flush();
+    
+                return $this->json(
+                    array("code"=>200,"type"=>"success","message"=>"O usuario foi removido com sucesso!"),
+                    200
+                );
+    
+            }else{
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
+                400);
+            }
+
+        }catch(Exception $e){
             return $this->json(
-                array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
-            400);
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
         }
     }
 
     /** 
-     * Listar informações do Usuário
      * @Route("/usuario/informations/{id}", name="app_usuario_informations", methods="GET")
-     * @param Request $request
-     * @return string JSON
      */
-    public function getUserInformations($id = null, Request $request) : Response
+    public function getUserInformations($id = null, UsuariosRepository $userRepo, Request $request) : Response
     {
-        if(intval($id)){
+        try{
 
-        }else{
+            if(intval($id)){
+
+                $usuario = $userRepo->find($id);
+    
+                if(!$usuario){
+                    return $this->json(
+                        array("code"=>400,"type"=>"error","message"=>"Usuário não encontrado!"),
+                        400
+                    );
+                }
+    
+                return $this->json(
+                    array("code"=>200,"type","success","message"=>$usuario),
+                    200
+                );
+    
+            }else{
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
+                    400
+                );
+            }
+
+        }catch(Exception $e){
             return $this->json(
-                array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
-            400);
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
         }
     }
 
     /** 
-     * Listar todos os usuários
      * @Route("/usuario/listUsers", name="app_usuario_all", methods="GET")
-     * @param Request $request
-     * @return string JSON
      */
-    public function getAllUsers(Request $request) : Response
+    public function getAllUsers(UsuariosRepository $userRepo, Request $request) : Response
     {
-        return new Response('test');
+        try{
+
+            $usuario = $userRepo->findAll();
+
+            if(!$usuario){
+                return $this->json(
+                    array("code"=>204,"type"=>"success","message"=>"Nenhum usuário encontrado!"),
+                    204
+                );
+            }
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>$usuario),
+                200
+            );
+
+        }catch(Exception $e){
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+        }
     }
 }

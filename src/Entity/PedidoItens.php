@@ -13,39 +13,52 @@ class PedidoItens
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Produtos::class, inversedBy: 'pedidoItens')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Column(type: 'integer')]
     private $produto;
 
-    #[ORM\ManyToOne(targetEntity: Pedidos::class, inversedBy: 'pedidoItens')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Column(type: 'integer')]
     private $pedido;
+
+    #[ORM\Column(type: 'datetime')]
+    private $created_at;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduto(): ?Produtos
+    public function getProduto(): ?int
     {
         return $this->produto;
     }
 
-    public function setProduto(?Produtos $produto): self
+    public function setProduto(int $produto): self
     {
         $this->produto = $produto;
 
         return $this;
     }
 
-    public function getPedido(): ?Pedidos
+    public function getPedido(): ?int
     {
         return $this->pedido;
     }
 
-    public function setPedido(?Pedidos $pedido): self
+    public function setPedido(int $pedido): self
     {
         $this->pedido = $pedido;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
 
         return $this;
     }

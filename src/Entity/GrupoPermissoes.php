@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\GrupoPermissoesRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GrupoPermissoesRepository::class)]
@@ -26,14 +24,6 @@ class GrupoPermissoes
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
-
-    #[ORM\OneToMany(mappedBy: 'grupo', targetEntity: Usuarios::class)]
-    private $usuarios;
-
-    public function __construct()
-    {
-        $this->usuarios = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -84,36 +74,6 @@ class GrupoPermissoes
     public function setUpdatedAt(?\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Usuarios>
-     */
-    public function getUsuarios(): Collection
-    {
-        return $this->usuarios;
-    }
-
-    public function addUsuario(Usuarios $usuario): self
-    {
-        if (!$this->usuarios->contains($usuario)) {
-            $this->usuarios[] = $usuario;
-            $usuario->setGrupo($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUsuario(Usuarios $usuario): self
-    {
-        if ($this->usuarios->removeElement($usuario)) {
-            // set the owning side to null (unless already changed)
-            if ($usuario->getGrupo() === $this) {
-                $usuario->setGrupo(null);
-            }
-        }
 
         return $this;
     }

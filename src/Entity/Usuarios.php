@@ -13,6 +13,9 @@ class Usuarios
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[ORM\Column(type: 'integer')]
+    private $grupo;
+
     #[ORM\Column(type: 'string', length: 200)]
     private $nome;
 
@@ -24,10 +27,6 @@ class Usuarios
 
     #[ORM\Column(type: 'string', length: 200)]
     private $password;
-
-    #[ORM\ManyToOne(targetEntity: GrupoPermissoes::class, inversedBy: 'usuarios')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $grupo;
 
     #[ORM\Column(type: 'integer')]
     private $removed;
@@ -41,6 +40,18 @@ class Usuarios
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getGrupo(): ?int
+    {
+        return $this->grupo;
+    }
+
+    public function setGrupo(int $grupo): self
+    {
+        $this->grupo = $grupo;
+
+        return $this;
     }
 
     public function getNome(): ?string
@@ -87,18 +98,6 @@ class Usuarios
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    public function getGrupo(): ?GrupoPermissoes
-    {
-        return $this->grupo;
-    }
-
-    public function setGrupo(?GrupoPermissoes $grupo): self
-    {
-        $this->grupo = $grupo;
 
         return $this;
     }

@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\SituacaoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SituacaoRepository::class)]
@@ -23,14 +21,6 @@ class Situacao
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
-
-    #[ORM\OneToMany(mappedBy: 'situacao', targetEntity: Pedidos::class)]
-    private $pedidos;
-
-    public function __construct()
-    {
-        $this->pedidos = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -69,36 +59,6 @@ class Situacao
     public function setUpdatedAt(?\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Pedidos>
-     */
-    public function getPedidos(): Collection
-    {
-        return $this->pedidos;
-    }
-
-    public function addPedido(Pedidos $pedido): self
-    {
-        if (!$this->pedidos->contains($pedido)) {
-            $this->pedidos[] = $pedido;
-            $pedido->setSituacao($this);
-        }
-
-        return $this;
-    }
-
-    public function removePedido(Pedidos $pedido): self
-    {
-        if ($this->pedidos->removeElement($pedido)) {
-            // set the owning side to null (unless already changed)
-            if ($pedido->getSituacao() === $this) {
-                $pedido->setSituacao(null);
-            }
-        }
 
         return $this;
     }

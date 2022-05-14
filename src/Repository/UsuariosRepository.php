@@ -39,28 +39,26 @@ class UsuariosRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Usuarios[] Returns an array of Usuarios objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findByEmailAndPassword($email,$password): ?Usuarios 
+    {
+        return $this->createQueryBuilder('u')
+        ->andWhere('u.email = :email')
+        ->andWhere('u.password = :password')
+        ->setParameter('email',$email)
+        ->setParameter('password',$password)
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
 
-//    public function findOneBySomeField($value): ?Usuarios
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+
+    public function findByEmail($email): ?Usuarios
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.email = :email')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
 }

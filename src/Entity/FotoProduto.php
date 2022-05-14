@@ -13,10 +13,10 @@ class FotoProduto
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Produtos::class, inversedBy: 'fotoProdutos')]
+    #[ORM\Column(type: 'integer')]
     private $produto;
 
-    #[ORM\Column(type: 'blob')]
+    #[ORM\Column(type: 'text')]
     private $foto;
 
     #[ORM\Column(type: 'datetime')]
@@ -27,24 +27,24 @@ class FotoProduto
         return $this->id;
     }
 
-    public function getProduto(): ?Produtos
+    public function getProduto(): ?int
     {
         return $this->produto;
     }
 
-    public function setProduto(?Produtos $produto): self
+    public function setProduto(int $produto): self
     {
         $this->produto = $produto;
 
         return $this;
     }
 
-    public function getFoto()
+    public function getFoto(): ?string
     {
         return $this->foto;
     }
 
-    public function setFoto($foto): self
+    public function setFoto(string $foto): self
     {
         $this->foto = $foto;
 
