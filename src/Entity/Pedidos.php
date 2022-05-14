@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PedidosRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PedidosRepository::class)]
@@ -13,13 +15,15 @@ class Pedidos
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\ManyToOne(targetEntity: FormaPagamento::class, inversedBy: 'pedidos')]
+    #[ORM\JoinColumn(nullable: false)]
     private $forma_pagamento;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 3)]
     private $valor;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\ManyToOne(targetEntity: Situacao::class, inversedBy: 'pedidos')]
+    #[ORM\JoinColumn(nullable: false)]
     private $situacao;
 
     #[ORM\Column(type: 'integer')]
@@ -31,17 +35,25 @@ class Pedidos
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
+    #[ORM\ManyToMany(targetEntity: PedidosItens::class, mappedBy: 'pedido')]
+    private $pedidosItens;
+
+    public function __construct()
+    {
+        $this->pedidosItens = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFormaPagamento(): ?int
+    public function getFormaPagamento(): ?FormaPagamento
     {
         return $this->forma_pagamento;
     }
 
-    public function setFormaPagamento(int $forma_pagamento): self
+    public function setFormaPagamento(?FormaPagamento $forma_pagamento): self
     {
         $this->forma_pagamento = $forma_pagamento;
 
@@ -60,12 +72,12 @@ class Pedidos
         return $this;
     }
 
-    public function getSituacao(): ?int
+    public function getSituacao(): ?Situacao
     {
         return $this->situacao;
     }
 
-    public function setSituacao(int $situacao): self
+    public function setSituacao(?Situacao $situacao): self
     {
         $this->situacao = $situacao;
 
@@ -104,6 +116,33 @@ class Pedidos
     public function setUpdatedAt(?\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PedidosItens>
+     */
+    public function getPedidosItens(): Collection
+    {
+        return $this->pedidosItens;
+    }
+
+    public function addPedidosIten(PedidosItens $pedidosIten): self
+    {
+        if (!$this->pedidosItens->contains($pedidosIten)) {
+            $this->pedidosItens[] = $pedidosIten;
+            $pedidosIten->addPedido($this);
+        }
+
+        return $this;
+    }
+
+    public function removePedidosIten(PedidosItens $pedidosIten): self
+    {
+        if ($this->pedidosItens->removeElement($pedidosIten)) {
+            $pedidosIten->removePedido($this);
+        }
 
         return $this;
     }

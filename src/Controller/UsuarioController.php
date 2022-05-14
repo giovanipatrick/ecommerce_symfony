@@ -177,6 +177,6 @@ class UsuarioController extends AbstractController{
      */
     public function getAllUsers(Request $request) : Response
     {
-
+        return new Response('test');
     }
 }

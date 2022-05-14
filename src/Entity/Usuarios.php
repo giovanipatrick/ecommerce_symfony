@@ -25,7 +25,8 @@ class Usuarios
     #[ORM\Column(type: 'string', length: 200)]
     private $password;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\ManyToOne(targetEntity: GrupoPermissoes::class, inversedBy: 'usuarios')]
+    #[ORM\JoinColumn(nullable: false)]
     private $grupo;
 
     #[ORM\Column(type: 'integer')]
@@ -90,12 +91,12 @@ class Usuarios
         return $this;
     }
 
-    public function getGrupo(): ?int
+    public function getGrupo(): ?GrupoPermissoes
     {
         return $this->grupo;
     }
 
-    public function setGrupo(int $grupo): self
+    public function setGrupo(?GrupoPermissoes $grupo): self
     {
         $this->grupo = $grupo;
 

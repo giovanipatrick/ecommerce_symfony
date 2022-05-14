@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\GrupoPermissoesRepository;
+use App\Repository\SituacaoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: GrupoPermissoesRepository::class)]
-class GrupoPermissoes
+#[ORM\Entity(repositoryClass: SituacaoRepository::class)]
+class Situacao
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,21 +18,18 @@ class GrupoPermissoes
     #[ORM\Column(type: 'string', length: 200)]
     private $descricao;
 
-    #[ORM\Column(type: 'array')]
-    private $permissoes = [];
-
     #[ORM\Column(type: 'datetime')]
     private $created_at;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
-    #[ORM\OneToMany(mappedBy: 'grupo', targetEntity: Usuarios::class)]
-    private $usuarios;
+    #[ORM\OneToMany(mappedBy: 'situacao', targetEntity: Pedidos::class)]
+    private $pedidos;
 
     public function __construct()
     {
-        $this->usuarios = new ArrayCollection();
+        $this->pedidos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -48,18 +45,6 @@ class GrupoPermissoes
     public function setDescricao(string $descricao): self
     {
         $this->descricao = $descricao;
-
-        return $this;
-    }
-
-    public function getPermissoes(): ?array
-    {
-        return $this->permissoes;
-    }
-
-    public function setPermissoes(array $permissoes): self
-    {
-        $this->permissoes = $permissoes;
 
         return $this;
     }
@@ -89,29 +74,29 @@ class GrupoPermissoes
     }
 
     /**
-     * @return Collection<int, Usuarios>
+     * @return Collection<int, Pedidos>
      */
-    public function getUsuarios(): Collection
+    public function getPedidos(): Collection
     {
-        return $this->usuarios;
+        return $this->pedidos;
     }
 
-    public function addUsuario(Usuarios $usuario): self
+    public function addPedido(Pedidos $pedido): self
     {
-        if (!$this->usuarios->contains($usuario)) {
-            $this->usuarios[] = $usuario;
-            $usuario->setGrupo($this);
+        if (!$this->pedidos->contains($pedido)) {
+            $this->pedidos[] = $pedido;
+            $pedido->setSituacao($this);
         }
 
         return $this;
     }
 
-    public function removeUsuario(Usuarios $usuario): self
+    public function removePedido(Pedidos $pedido): self
     {
-        if ($this->usuarios->removeElement($usuario)) {
+        if ($this->pedidos->removeElement($pedido)) {
             // set the owning side to null (unless already changed)
-            if ($usuario->getGrupo() === $this) {
-                $usuario->setGrupo(null);
+            if ($pedido->getSituacao() === $this) {
+                $pedido->setSituacao(null);
             }
         }
 
