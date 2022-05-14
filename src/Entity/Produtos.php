@@ -45,16 +45,17 @@ class Produtos
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
-    #[ORM\ManyToMany(targetEntity: PedidosItens::class, mappedBy: 'produto')]
-    private $pedidosItens;
-
     #[ORM\OneToMany(mappedBy: 'produto', targetEntity: FotoProduto::class)]
     private $fotoProdutos;
+
+    #[ORM\OneToMany(mappedBy: 'produto', targetEntity: PedidoItens::class)]
+    private $pedidoItens;
 
     public function __construct()
     {
         $this->pedidosItens = new ArrayCollection();
         $this->fotoProdutos = new ArrayCollection();
+        $this->pedidoItens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -183,33 +184,6 @@ class Produtos
     }
 
     /**
-     * @return Collection<int, PedidosItens>
-     */
-    public function getPedidosItens(): Collection
-    {
-        return $this->pedidosItens;
-    }
-
-    public function addPedidosIten(PedidosItens $pedidosIten): self
-    {
-        if (!$this->pedidosItens->contains($pedidosIten)) {
-            $this->pedidosItens[] = $pedidosIten;
-            $pedidosIten->addProduto($this);
-        }
-
-        return $this;
-    }
-
-    public function removePedidosIten(PedidosItens $pedidosIten): self
-    {
-        if ($this->pedidosItens->removeElement($pedidosIten)) {
-            $pedidosIten->removeProduto($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, FotoProduto>
      */
     public function getFotoProdutos(): Collection
@@ -233,6 +207,36 @@ class Produtos
             // set the owning side to null (unless already changed)
             if ($fotoProduto->getProduto() === $this) {
                 $fotoProduto->setProduto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PedidoItens>
+     */
+    public function getPedidoItens(): Collection
+    {
+        return $this->pedidoItens;
+    }
+
+    public function addPedidoIten(PedidoItens $pedidoIten): self
+    {
+        if (!$this->pedidoItens->contains($pedidoIten)) {
+            $this->pedidoItens[] = $pedidoIten;
+            $pedidoIten->setProduto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePedidoIten(PedidoItens $pedidoIten): self
+    {
+        if ($this->pedidoItens->removeElement($pedidoIten)) {
+            // set the owning side to null (unless already changed)
+            if ($pedidoIten->getProduto() === $this) {
+                $pedidoIten->setProduto(null);
             }
         }
 

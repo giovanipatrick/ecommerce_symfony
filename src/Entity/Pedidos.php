@@ -35,12 +35,14 @@ class Pedidos
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
-    #[ORM\ManyToMany(targetEntity: PedidosItens::class, mappedBy: 'pedido')]
-    private $pedidosItens;
+    #[ORM\OneToMany(mappedBy: 'pedido', targetEntity: PedidoItens::class)]
+    private $pedidoItens;
+
 
     public function __construct()
     {
         $this->pedidosItens = new ArrayCollection();
+        $this->pedidoItens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -121,27 +123,30 @@ class Pedidos
     }
 
     /**
-     * @return Collection<int, PedidosItens>
+     * @return Collection<int, PedidoItens>
      */
-    public function getPedidosItens(): Collection
+    public function getPedidoItens(): Collection
     {
-        return $this->pedidosItens;
+        return $this->pedidoItens;
     }
 
-    public function addPedidosIten(PedidosItens $pedidosIten): self
+    public function addPedidoIten(PedidoItens $pedidoIten): self
     {
-        if (!$this->pedidosItens->contains($pedidosIten)) {
-            $this->pedidosItens[] = $pedidosIten;
-            $pedidosIten->addPedido($this);
+        if (!$this->pedidoItens->contains($pedidoIten)) {
+            $this->pedidoItens[] = $pedidoIten;
+            $pedidoIten->setPedido($this);
         }
 
         return $this;
     }
 
-    public function removePedidosIten(PedidosItens $pedidosIten): self
+    public function removePedidoIten(PedidoItens $pedidoIten): self
     {
-        if ($this->pedidosItens->removeElement($pedidosIten)) {
-            $pedidosIten->removePedido($this);
+        if ($this->pedidoItens->removeElement($pedidoIten)) {
+            // set the owning side to null (unless already changed)
+            if ($pedidoIten->getPedido() === $this) {
+                $pedidoIten->setPedido(null);
+            }
         }
 
         return $this;

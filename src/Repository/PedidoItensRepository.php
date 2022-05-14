@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\PedidosItens;
+use App\Entity\PedidoItens;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PedidosItens>
+ * @extends ServiceEntityRepository<PedidoItens>
  *
- * @method PedidosItens|null find($id, $lockMode = null, $lockVersion = null)
- * @method PedidosItens|null findOneBy(array $criteria, array $orderBy = null)
- * @method PedidosItens[]    findAll()
- * @method PedidosItens[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method PedidoItens|null find($id, $lockMode = null, $lockVersion = null)
+ * @method PedidoItens|null findOneBy(array $criteria, array $orderBy = null)
+ * @method PedidoItens[]    findAll()
+ * @method PedidoItens[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PedidosItensRepository extends ServiceEntityRepository
+class PedidoItensRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, PedidosItens::class);
+        parent::__construct($registry, PedidoItens::class);
     }
 
-    public function add(PedidosItens $entity, bool $flush = false): void
+    public function add(PedidoItens $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class PedidosItensRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(PedidosItens $entity, bool $flush = false): void
+    public function remove(PedidoItens $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class PedidosItensRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return PedidosItens[] Returns an array of PedidosItens objects
+//     * @return PedidoItens[] Returns an array of PedidoItens objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class PedidosItensRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?PedidosItens
+//    public function findOneBySomeField($value): ?PedidoItens
 //    {
 //        return $this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')
