@@ -79,13 +79,26 @@ class UsuarioController extends AbstractController{
      * Autenticação do Usuário
      * @Route("/usuario/authenticate", name="app_usuario_authenticate", methods="POST")
      * @param Request $request
+     * @throws Exception
      * @return string JSON
      */
     public function authUser(Request $request) : Response
     {
-        return $this->json(
-            array("code"=>200,"type"=>"success","message"=>"Hello World"),
-        200);
+        try{
+            if($request->get('email')){
+                if($request->get('password')){
+                    return $this->json(
+                        array("code"=>200,"type"=>"success","message"=>"Usuário autenticado"),
+                    200);
+                }else{
+                    throw new Exception('A senha não foi informada!');
+                }
+            }else{
+                throw new Exception('O email não foi informado!');
+            }
+        }catch(Exception $e){
+            return $this->json(array("code"=>400,"type"=>"error","message"=>$e->getMessage()));
+        }
     }
 
     /**
@@ -124,12 +137,19 @@ class UsuarioController extends AbstractController{
 
     /** 
      * Desabilitar Usuário
-     * @Route("/usuario/inactivate", name="app_usuario_inactivate", methods="DELETE")
+     * @Route("/usuario/inactivate/{id}", name="app_usuario_inactivate", methods="DELETE")
      * @param Request $request
      * @return string JSON
      */
-    public function inactivateUser(Request $request) : Response
+    public function inactivateUser($id = null, Request $request) : Response
     {
+        if(intval($id)){
+
+        }else{
+            return $this->json(
+                array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
+            400);
+        }
     }
 
     /** 
@@ -144,7 +164,7 @@ class UsuarioController extends AbstractController{
 
         }else{
             return $this->json(
-                array("code"=>"400","type"=>"error","message"=>"O identificar do usuário não foi informado"),
+                array("code"=>400,"type"=>"error","message"=>"O identificar do usuário não foi informado"),
             400);
         }
     }
