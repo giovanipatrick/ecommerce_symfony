@@ -39,28 +39,73 @@ class PedidosRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Pedidos[] Returns an array of Pedidos objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+   public function findById($id)
+   {
+       $conn = $this->getEntityManager()->getConnection();
 
-//    public function findOneBySomeField($value): ?Pedidos
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+       $sql = 'SELECT 
+       p.*, 
+       f.nome AS forma_pagamento, 
+       s.nome AS situacao
+     FROM 
+       pedidos AS p 
+       INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
+       INNER JOIN situacao AS s ON(p.situacao_id = s.id) 
+     WHERE 
+       p.id = :id';
+
+       $stmt = $conn->prepare($sql);
+
+       $resul = $stmt->executeQuery(array(
+            ":id"=>$id 
+       ));
+
+       return $resul->fetchAllAssociative();
+
+   }
+
+   public function findAllWithJoin()
+   {
+       $conn = $this->getEntityManager()->getConnection();
+
+       $sql = "SELECT 
+       p.*, 
+       f.nome AS forma_pagamento, 
+       s.nome AS situacao 
+     FROM 
+       pedidos AS p 
+       INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
+       INNER JOIN situacao AS s ON(p.situacao_id = s.id)";
+
+       $stmt = $conn->prepare($sql);
+
+       $resul = $stmt->executeQuery();
+
+       return $resul->fetchAllAssociative();
+   }
+
+   public function getAttrProducts($pedido_id)
+   {
+       $conn = $this->getEntityManager()->getConnection();
+
+       $sql = "SELECT 
+       p.nome, 
+       p.codigo_barra, 
+       p.descricao, 
+       p.peso 
+     FROM 
+       pedido_itens AS i 
+       INNER JOIN produtos AS p ON(i.produto_id = p.id) 
+       INNER JOIN pedidos AS ped ON(i.pedido_id = ped.id) 
+     WHERE 
+       i.pedido_id = :pedido_id";
+
+       $stmt = $conn->prepare($sql);
+
+       $resul = $stmt->executeQuery(array(
+            ":pedido_id"=>$pedido_id
+       ));
+
+       return $resul->fetchAllAssociative();
+   }
 }

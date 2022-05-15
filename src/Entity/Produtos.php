@@ -19,9 +19,6 @@ class Produtos
     private $nome;
 
     #[ORM\Column(type: 'integer')]
-    private $categoria;
-
-    #[ORM\Column(type: 'integer')]
     private $codigo_barra;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 3)]
@@ -66,18 +63,6 @@ class Produtos
     public function setNome(string $nome): self
     {
         $this->nome = $nome;
-
-        return $this;
-    }
-
-    public function getCategoria(): ?int
-    {
-        return $this->categoria;
-    }
-
-    public function setCategoria(int $categoria): self
-    {
-        $this->categoria = $categoria;
 
         return $this;
     }

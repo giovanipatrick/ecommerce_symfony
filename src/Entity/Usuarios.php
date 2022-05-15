@@ -13,9 +13,6 @@ class Usuarios
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
-    private $grupo;
-
     #[ORM\Column(type: 'string', length: 200)]
     private $nome;
 
@@ -40,18 +37,6 @@ class Usuarios
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getGrupo(): ?int
-    {
-        return $this->grupo;
-    }
-
-    public function setGrupo(int $grupo): self
-    {
-        $this->grupo = $grupo;
-
-        return $this;
     }
 
     public function getNome(): ?string

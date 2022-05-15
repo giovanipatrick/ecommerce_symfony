@@ -87,7 +87,6 @@ class ProdutosController extends AbstractController
             
             $produtosEntity = new Produtos;
             $produtosEntity->setNome($values->nome);
-            $produtosEntity->setCategoria($values->categoria);
             $produtosEntity->setCodigoBarra($values->codigo_barra);
             $produtosEntity->setValor($values->valor);
             $produtosEntity->setQuantidade($values->quantidade);
@@ -141,7 +140,6 @@ class ProdutosController extends AbstractController
             }
 
             $produto->setNome($values->nome);
-            $produto->setCategoria($values->categoria);
             $produto->setCodigoBarra($values->codigo_barra);
             $produto->setValor($values->valor);
             $produto->setQuantidade($values->quantidade);

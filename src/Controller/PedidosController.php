@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\PedidoItens;
 use App\Entity\Pedidos;
 use App\Repository\PedidosRepository;
 use App\Repository\FormaPagamentoRepository;
+use App\Repository\PedidoItensRepository;
+use App\Repository\ProdutosRepository;
 use App\Repository\SituacaoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,7 +73,7 @@ class PedidosController extends AbstractController
             if($forma_pagamento){
                 if($situacao){
                     $pedido = new Pedidos;
-                    $pedido->setFormaPagamento($$forma_pagamento);
+                    $pedido->setFormaPagamento($forma_pagamento);
                     $pedido->setSituacao($situacao);
                     $pedido->setValor($values->valor);
                     $pedido->setRemoved(0);
@@ -105,12 +108,30 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/update", name="app_pedidos_update", methods="PUT")
      */
-    public function update(EntityManagerInterface $em, PedidosRepository $pedidosRepository, Request $request) : Response
+    public function update(EntityManagerInterface $em, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, PedidosRepository $pedidosRepository, Request $request) : Response
     {
         try{
 
             $this->validateParams($request,false);
             $values = $this->reqParams($request);
+            
+            $forma_pagamento = $formaPagamentoRepository->find($values->forma_pagamento);
+
+            if(!$forma_pagamento){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"A forma de pagamento é inválida!"),
+                    400
+                );
+            }
+
+            $situacao = $situacaoRepository->find($values->situacao);
+
+            if(!$situacao){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"A situação é inválida!"),
+                    400
+                );
+            }
 
             $pedido = $pedidosRepository->find($values->id);
 
@@ -121,8 +142,8 @@ class PedidosController extends AbstractController
                 );
             }
 
-            $pedido->setFormaPagamento($values->forma_pagamento);
-            $pedido->setSituacao($values->situacao);
+            $pedido->setFormaPagamento($forma_pagamento);
+            $pedido->setSituacao($situacao);
             $pedido->setValor($values->valor);
             $pedido->setUpdatedAt(new \DateTime());
 
@@ -147,7 +168,7 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/inactivate/{id}", name="app_pedidos_inactivate", methods="DELETE")
      */
-    public function inactivatePedido($id = null,EntityManagerInterface $em, PedidosRepository $pedidosRepository, Request $request) : Response
+    public function inactivatePedido($id = null,EntityManagerInterface $em, PedidosRepository $pedidosRepository) : Response
     {
 
         try{
@@ -205,7 +226,7 @@ class PedidosController extends AbstractController
                 );
             }
 
-            $pedido = $pedidosRepository->find($id);
+            $pedido = $pedidosRepository->findById($id);
 
             if(!$pedido){
                 return $this->json(
@@ -238,7 +259,7 @@ class PedidosController extends AbstractController
 
         try{
 
-            $pedido = $pedidosRepository->findAll();
+            $pedido = $pedidosRepository->findAllWithJoin();
 
             if(!$pedido){
                 return $this->json(
@@ -261,6 +282,119 @@ class PedidosController extends AbstractController
 
         }
 
+    }
+
+    /** 
+     * @Route("/pedidos/attr_product", name="app_attr_products_create", methods="POST")
+     */
+    public function attrProduct(ProdutosRepository $produtosRepository, PedidoItensRepository $pedidoItensRepository, PedidosRepository $pedidosRepository, Request $request) : Response
+    {
+        try{
+
+            $pedido_id = intval($request->get('pedido_id'));
+            $produto_id = intval($request->get('produto_id'));
+            $valor = floatval($request->get('valor'));
+    
+            if(!$pedido_id){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O id do pedido não foi informado"),
+                    400
+                );
+            }
+    
+            if(!$produto_id){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O id do produto não foi informado!"),
+                    400
+                );
+            }
+    
+            if(!$valor){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O valor do produto não foi informado!"),
+                    400
+                );
+            }
+    
+            $pedidoItens = new PedidoItens;
+    
+            $pedido = $pedidosRepository->find($pedido_id);
+    
+            if(!$pedido){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O pedido não foi encontrado!"),
+                    400
+                );
+            }
+    
+            $produto = $produtosRepository->find($produto_id);
+    
+            if(!$produto){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O produto não foi encontrado!"),
+                    400
+                );
+            }
+    
+            $pedidoItens->setPedido($pedido);
+            $pedidoItens->setProduto($produto);
+            $pedidoItens->setValor($valor);
+            $pedidoItens->setCreatedAt(new \DateTime());
+    
+            $pedidoItensRepository->add($pedidoItens,true);
+    
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>"Produto atrelado ao pedido"),
+                200
+            );
+
+        }catch(Exception $e){
+            
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+
+        }
+
+    }
+
+    /**
+     * @Route("/pedidos/attr_products/{pedido_id}", name="app_attr_products_list", methods="GET")
+     */
+    public function listAttrProducts($pedido_id = null,PedidosRepository $pedidosRepository) : Response
+    {
+        try{
+
+            if(!intval($pedido_id)){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O id do pedido não foi informado!"),
+                    400
+                );
+            }
+
+            $pedido = $pedidosRepository->getAttrProducts($pedido_id);
+
+            if(!$pedido){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"Nenhum produto atrelado ao pedido informado!"),
+                    400
+                );
+            }
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>$pedido),
+                200
+            );
+
+        }catch(Exception $e){
+
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+
+        }
     }
     
 }

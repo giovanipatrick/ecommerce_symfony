@@ -78,7 +78,6 @@ class UsuarioController extends AbstractController{
             $userEnt->setSobrenome($values->sobrenome);
             $userEnt->setEmail($values->email);
             $userEnt->setPassword($values->password);
-            $userEnt->setGrupo($values->grupo);
             $userEnt->setRemoved(0);
             $userEnt->setCreatedAt(new \DateTime());
 
@@ -126,7 +125,6 @@ class UsuarioController extends AbstractController{
             $usuario->setSobrenome($values->sobrenome);
             $usuario->setEmail($values->email);
             $usuario->setPassword($values->password);
-            $usuario->setGrupo($values->grupo);
             $usuario->setUpdatedAt(new \DateTime());
 
             $em->flush();
