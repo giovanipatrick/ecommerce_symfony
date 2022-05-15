@@ -55,44 +55,195 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/create", name="app_pedidos_create", methods="POST")
      */
-    public function create() : Response
+    public function create(PedidosRepository $pedidosRepository, Request $request) : Response
     {
         try{
+
+            $this->validateParams($request,false);
+            $values = $this->reqParams($request);
+
+            $pedido = new Pedidos;
+            $pedido->setFormaPagamento($values->forma_pagamento);
+            $pedido->setSituacao($values->situacao);
+            $pedido->setValor($values->valor);
+            $pedido->setRemoved(0);
+            $pedido->setCreatedAt(new \DateTime());
+
+            $pedidosRepository->add($pedido,true);
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>"O pedido foi registrado com sucesso!"),
+                200
+            );
             
         }catch(Exception $e){
-            throw new Exception($e->getMessage());
+
+            return $this->json(
+                array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
+                400
+            );
+            
         }
     }
 
     /** 
      * @Route("/pedidos/update", name="app_pedidos_update", methods="PUT")
      */
-    public function update() : Response
+    public function update(EntityManagerInterface $em, PedidosRepository $pedidosRepository, Request $request) : Response
     {
+        try{
 
+            $this->validateParams($request,false);
+            $values = $this->reqParams($request);
+
+            $pedido = $pedidosRepository->find($values->id);
+
+            if(!$pedido){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"Pedido não encontrado!"),
+                    400
+                );
+            }
+
+            $pedido->setFormaPagamento($values->forma_pagamento);
+            $pedido->setSituacao($values->situacao);
+            $pedido->setValor($values->valor);
+            $pedido->setUpdatedAt(new \DateTime());
+
+            $em->flush();
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","Pedido atualizado com sucesso!"),
+                200
+            );
+
+
+        }catch(Exception $e){
+
+            return $this->json(
+                array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
+                400
+            );
+
+        }
     }
 
     /** 
      * @Route("/pedidos/inactivate/{id}", name="app_pedidos_inactivate", methods="DELETE")
      */
-    public function inactivatePedido() : Response
+    public function inactivatePedido($id = null,EntityManagerInterface $em, PedidosRepository $pedidosRepository, Request $request) : Response
     {
+
+        try{
+            
+            if(intval($id)){
+
+                $pedido = $pedidosRepository->find($id);
+
+                if(!$pedido){
+                    return $this->json(
+                        array("code"=>400,"type"=>"error","message"=>"O pedido não foi encontrado!")
+                    );
+                }
+
+                $pedido->setRemoved(1);
+                $pedido->setUpdatedAt(new \DateTime());
+
+                $em->flush();
+
+                return $this->json(
+                    array("code"=>200,"type"=>"success","message"=>"O pedido foi removido com sucesso"),
+                    200
+                );
+
+            }else{
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O identificar do pedido não foi informado!"),
+                    400
+                );
+            }
+
+        }catch(Exception $e){
+
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+
+        }
 
     }
 
     /** 
      * @Route("/pedidos/informations/{id}", name="app_pedidos_informations", methods="GET")
      */
-    public function getPedido() : Response
+    public function getPedido($id = null, PedidosRepository $pedidosRepository) : Response
     {
+
+        try{
+
+            if(!intval($id)){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O identificar do pedido não foi informado"),
+                    400
+                );
+            }
+
+            $pedido = $pedidosRepository->find($id);
+
+            if(!$pedido){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"Pedido não encontrado!"),
+                    400
+                );
+            }
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>$pedido),
+                200
+            );
+
+        }catch(Exception $e){
+
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+
+        }
 
     }
 
     /** 
      * @Route("/pedidos/listPedidos", name="app_pedidos_list", methods="GET")
      */
-    public function listAll() : Response
+    public function listAll(PedidosRepository $pedidosRepository) : Response
     {
+
+        try{
+
+            $pedido = $pedidosRepository->findAll();
+
+            if(!$pedido){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"Nenhum pedido encontrado!"),
+                    400
+                );
+            }
+
+            return $this->json(
+                array("code"=>200,"type"=>"success","message"=>$pedido),
+                200
+            );
+
+        }catch(Exception $e){
+
+            return $this->json(
+                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
+                500
+            );
+
+        }
 
     }
     
