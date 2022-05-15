@@ -48,4 +48,34 @@ class ProdutosRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    public function findById($id)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT * FROM produtos WHERE id = :id";
+
+        $stmt = $conn->prepare($sql);
+
+        $resul = $stmt->executeQuery(array(
+            ":id"=>$id 
+       ));
+
+        return $resul->fetchAllAssociative();
+
+    }
+
+    public function findAllNoJoin()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT * FROM produtos";
+
+        $stmt = $conn->prepare($sql);
+
+        
+        $resul = $stmt->executeQuery(array());
+
+        return $resul->fetchAllAssociative();
+    }
 }

@@ -215,7 +215,7 @@ class ProdutosController extends AbstractController
 
             if(intval($id)){
 
-                $produto = $produtosRepository->find($id);
+                $produto = $produtosRepository->findById($id);
 
                 if(!$produto){
                     return $this->json(
@@ -251,7 +251,7 @@ class ProdutosController extends AbstractController
     {
         try{
 
-            $produto = $produtosRepository->findAll();
+            $produto = $produtosRepository->findAllNoJoin();
 
             if(!$produto){
                 return $this->json(

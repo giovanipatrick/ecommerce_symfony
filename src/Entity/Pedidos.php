@@ -15,10 +15,11 @@ class Pedidos
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\OneToOne(inversedBy: 'pedidos', targetEntity: FormaPagamento::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'pedidos', targetEntity: FormaPagamento::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
     private $forma_pagamento;
 
-    #[ORM\OneToOne(inversedBy: 'pedidos', targetEntity: Situacao::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'pedidos', targetEntity: Situacao::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private $situacao;
 
