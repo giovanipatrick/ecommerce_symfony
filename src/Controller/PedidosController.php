@@ -150,7 +150,7 @@ class PedidosController extends AbstractController
             $em->flush();
 
             return $this->json(
-                array("code"=>200,"type"=>"success","Pedido atualizado com sucesso!"),
+                array("code"=>200,"type"=>"success","message"=>"Pedido atualizado com sucesso!"),
                 200
             );
 

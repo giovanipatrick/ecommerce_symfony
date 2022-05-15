@@ -15,6 +15,8 @@ Teste para a vaga de Back-End utilizando Symfony e PHP 8.0 para criar um Ecommer
 
 ```sh
 git clone https://github.com/giovanipatrick/ecommerce_symfony.git
+cd ecommerce_symfony
+composer update
 ```
 
 - Subir Database Limpa
@@ -33,7 +35,7 @@ Importe ecommerce_symfony.sql
 symfony server:start -port 8080
 ```
 
-- External Apahe
+- Apache
 ```sh
 Aponte ecommerce_symfony/public no VirtualHost
 ```
