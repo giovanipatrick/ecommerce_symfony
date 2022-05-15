@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PedidosRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PedidosRepository::class)]
@@ -13,10 +15,11 @@ class Pedidos
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\OneToOne(inversedBy: 'pedidos', targetEntity: FormaPagamento::class, cascade: ['persist', 'remove'])]
     private $forma_pagamento;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\OneToOne(inversedBy: 'pedidos', targetEntity: Situacao::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
     private $situacao;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 3)]
@@ -31,29 +34,38 @@ class Pedidos
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
+    #[ORM\OneToMany(mappedBy: 'pedido', targetEntity: PedidoItens::class)]
+    private $pedidoItens;
+
+    public function __construct()
+    {
+        $this->pedidoItens = new ArrayCollection();
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFormaPagamento(): ?int
+    public function getFormaPagamento(): ?FormaPagamento
     {
         return $this->forma_pagamento;
     }
 
-    public function setFormaPagamento(int $forma_pagamento): self
+    public function setFormaPagamento(?FormaPagamento $forma_pagamento): self
     {
         $this->forma_pagamento = $forma_pagamento;
 
         return $this;
     }
 
-    public function getSituacao(): ?int
+    public function getSituacao(): ?Situacao
     {
         return $this->situacao;
     }
 
-    public function setSituacao(int $situacao): self
+    public function setSituacao(Situacao $situacao): self
     {
         $this->situacao = $situacao;
 
@@ -107,4 +119,35 @@ class Pedidos
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, PedidoItens>
+     */
+    public function getPedidoItens(): Collection
+    {
+        return $this->pedidoItens;
+    }
+
+    public function addPedidoIten(PedidoItens $pedidoIten): self
+    {
+        if (!$this->pedidoItens->contains($pedidoIten)) {
+            $this->pedidoItens[] = $pedidoIten;
+            $pedidoIten->setPedido($this);
+        }
+
+        return $this;
+    }
+
+    public function removePedidoIten(PedidoItens $pedidoIten): self
+    {
+        if ($this->pedidoItens->removeElement($pedidoIten)) {
+            // set the owning side to null (unless already changed)
+            if ($pedidoIten->getPedido() === $this) {
+                $pedidoIten->setPedido(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

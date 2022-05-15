@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Pedidos;
 use App\Repository\PedidosRepository;
+use App\Repository\FormaPagamentoRepository;
+use App\Repository\SituacaoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,26 +57,40 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/create", name="app_pedidos_create", methods="POST")
      */
-    public function create(PedidosRepository $pedidosRepository, Request $request) : Response
+    public function create(PedidosRepository $pedidosRepository, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, Request $request) : Response
     {
         try{
 
             $this->validateParams($request,false);
             $values = $this->reqParams($request);
 
-            $pedido = new Pedidos;
-            $pedido->setFormaPagamento($values->forma_pagamento);
-            $pedido->setSituacao($values->situacao);
-            $pedido->setValor($values->valor);
-            $pedido->setRemoved(0);
-            $pedido->setCreatedAt(new \DateTime());
+            $forma_pagamento = $formaPagamentoRepository->find($values->forma_pagamento);
+            $situacao = $situacaoRepository->find($values->situacao);
 
-            $pedidosRepository->add($pedido,true);
+            if($forma_pagamento){
+                if($situacao){
+                    $pedido = new Pedidos;
+                    $pedido->setFormaPagamento($$forma_pagamento);
+                    $pedido->setSituacao($situacao);
+                    $pedido->setValor($values->valor);
+                    $pedido->setRemoved(0);
+                    $pedido->setCreatedAt(new \DateTime());
+        
+                    $pedidosRepository->add($pedido,true);
+        
+                    return $this->json(
+                        array("code"=>200,"type"=>"success","message"=>"O pedido foi registrado com sucesso!"),
+                        200
+                    );
+                }else{
 
-            return $this->json(
-                array("code"=>200,"type"=>"success","message"=>"O pedido foi registrado com sucesso!"),
-                200
-            );
+                }
+            }else{
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"A forma de pagamento é invalida!"),
+                    400
+                );
+            }
             
         }catch(Exception $e){
 

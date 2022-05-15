@@ -37,10 +37,8 @@ class UsuarioController extends AbstractController{
             throw new Exception('O email não pode estar em branco e deve possuir no máximo 200 caracteres!');
         }
 
-        if(!$update){
-            if(!$request->get('password') || strlen($request->get('password')) < 8 || strlen($request->get('password')) > 30){
-                throw new Exception('A senha deve possuir no minimo 8 caracteres e no máximo 30');
-            }
+        if(!$request->get('password') || strlen($request->get('password')) < 8 || strlen($request->get('password')) > 30){
+            throw new Exception('A senha deve possuir no minimo 8 caracteres e no máximo 30');
         }
 
         if(!intval($request->get('grupo'))){
@@ -127,6 +125,7 @@ class UsuarioController extends AbstractController{
             $usuario->setNome($values->nome);
             $usuario->setSobrenome($values->sobrenome);
             $usuario->setEmail($values->email);
+            $usuario->setPassword($values->password);
             $usuario->setGrupo($values->grupo);
             $usuario->setUpdatedAt(new \DateTime());
 
@@ -206,7 +205,7 @@ class UsuarioController extends AbstractController{
                 }
     
                 return $this->json(
-                    array("code"=>200,"type","success","message"=>$usuario),
+                    array("code"=>200,"type"=>"success","message"=>$usuario),
                     200
                 );
     
