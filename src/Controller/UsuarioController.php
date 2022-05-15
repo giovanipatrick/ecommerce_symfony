@@ -17,10 +17,10 @@ class UsuarioController extends AbstractController{
     /** 
      * Trata os dados e gera uma Exception caso os critérios não sejam atendidos
      */
-    private function validateCreateAndUpdateParams($request,$update)
+    private function validateParams($request,$update)
     {
         if($update){
-            if(!$request->get('id')){
+            if(!intval($request->get('id'))){
                 throw new Exception('O identificar do usuário não foi informado!');
             }
         }
@@ -66,53 +66,13 @@ class UsuarioController extends AbstractController{
     }
 
     /**
-     * @Route("/usuario/authenticate", name="app_usuario_authenticate", methods="POST")
-     */
-    public function authUser(UsuariosRepository $userRepo, Request $request) : Response
-    {
-        try{
-            if($request->get('email')){
-                if($request->get('password')){
-                    $usuario = $userRepo->findByEmailAndPassword($request->get('email'),md5($request->get('password')));
-                        if(!$usuario){
-                            return $this->json(
-                                array("code"=>400,"type"=>"error","message"=>"Usuário ou senha incorreto(a)s"),
-                                400
-                            );
-                        }else{
-                            return $this->json(
-                                array("code"=>200,"type"=>"success","message"=>"Usuário autenticado!"),
-                                200
-                            );
-                        }
-                }else{
-                    return $this->json(
-                        array("code"=>400,"type"=>"error","message"=>"A senha não foi informada"),
-                        400
-                    );
-                }
-            }else{
-                return $this->json(
-                    array("code"=>400,"type"=>"error","message"=>"O email não foi informado"),
-                    400
-                );
-            }
-        }catch(Exception $e){
-            return $this->json(
-                array("code"=>500,"type"=>"error","message"=>$e->getMessage()),
-                500
-            );
-        }
-    }
-
-    /**
      * @Route("/usuario/create", name="app_usuario_create", methods="POST")
      */
     public function createUser(UsuariosRepository $userRepo,Request $request) : Response
     {
         try{
 
-            $this->validateCreateAndUpdateParams($request,false);
+            $this->validateParams($request,false);
             $values = $this->reqParams($request);
             
             $userEnt = new Usuarios;
@@ -140,7 +100,7 @@ class UsuarioController extends AbstractController{
         }catch(Exception $e){
             return $this->json(
                 array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
-                500
+                400
             );
         }
     }
@@ -152,7 +112,7 @@ class UsuarioController extends AbstractController{
     {
         try{
 
-            $this->validateCreateAndUpdateParams($request,true);
+            $this->validateParams($request,true);
             $values = $this->reqParams($request);
 
             $usuario = $userRepo->find($values->id);
@@ -180,7 +140,7 @@ class UsuarioController extends AbstractController{
         }catch(Exception $e){
             return $this->json(
                 array("code"=>400,"type"=>"error","message"=>$e->getMessage()),
-                500
+                400
             );
         }
     }
@@ -230,7 +190,7 @@ class UsuarioController extends AbstractController{
     /** 
      * @Route("/usuario/informations/{id}", name="app_usuario_informations", methods="GET")
      */
-    public function getUserInformations($id = null, UsuariosRepository $userRepo, Request $request) : Response
+    public function getUserInformations($id = null, UsuariosRepository $userRepo) : Response
     {
         try{
 
@@ -268,7 +228,7 @@ class UsuarioController extends AbstractController{
     /** 
      * @Route("/usuario/listUsers", name="app_usuario_all", methods="GET")
      */
-    public function getAllUsers(UsuariosRepository $userRepo, Request $request) : Response
+    public function getAllUsers(UsuariosRepository $userRepo) : Response
     {
         try{
 
