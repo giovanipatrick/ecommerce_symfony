@@ -51,6 +51,7 @@ class PedidosRepository extends ServiceEntityRepository
        pedidos AS p 
        INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
        INNER JOIN situacao AS s ON(p.situacao_id = s.id) 
+       INNER JOIN usuarios AS u ON(p.usuario_id = u.id)
      WHERE 
        p.id = :id';
 
@@ -75,7 +76,8 @@ class PedidosRepository extends ServiceEntityRepository
      FROM 
        pedidos AS p 
        INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
-       INNER JOIN situacao AS s ON(p.situacao_id = s.id)";
+       INNER JOIN situacao AS s ON(p.situacao_id = s.id)
+       INNER JOIN usuarios AS u ON(p.usuario_id = u.id)";
 
        $stmt = $conn->prepare($sql);
 

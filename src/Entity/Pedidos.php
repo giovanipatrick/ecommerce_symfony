@@ -38,6 +38,9 @@ class Pedidos
     #[ORM\OneToMany(mappedBy: 'pedido', targetEntity: PedidoItens::class)]
     private $pedidoItens;
 
+    #[ORM\ManyToOne(targetEntity: Usuarios::class, inversedBy: 'pedidos')]
+    private $usuario;
+
     public function __construct()
     {
         $this->pedidoItens = new ArrayCollection();
@@ -147,6 +150,18 @@ class Pedidos
                 $pedidoIten->setPedido(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUsuario(): ?Usuarios
+    {
+        return $this->usuario;
+    }
+
+    public function setUsuario(?Usuarios $usuario): self
+    {
+        $this->usuario = $usuario;
 
         return $this;
     }

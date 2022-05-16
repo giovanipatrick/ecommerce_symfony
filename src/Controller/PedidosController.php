@@ -9,6 +9,7 @@ use App\Repository\FormaPagamentoRepository;
 use App\Repository\PedidoItensRepository;
 use App\Repository\ProdutosRepository;
 use App\Repository\SituacaoRepository;
+use App\Repository\UsuariosRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,10 @@ class PedidosController extends AbstractController
             }
         }
 
+        if(!intval($request->get('usuario'))){
+            throw new Exception('O usuário não foi informado!');
+        }
+
         if(!intval($request->get('forma_pagamento'))){
             throw new Exception('A forma de pagamento não foi informada!');
         }
@@ -51,6 +56,7 @@ class PedidosController extends AbstractController
     {
         $data = new stdClass;
         $data->id = intval($request->get('id'));
+        $data->usuario = intval($request->get('usuario'));
         $data->forma_pagamento = intval($request->get('forma_pagamento'));
         $data->situacao = intval($request->get('situacao'));
         $data->valor = floatval($request->get('valor'));
@@ -60,7 +66,7 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/create", name="app_pedidos_create", methods="POST")
      */
-    public function create(PedidosRepository $pedidosRepository, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, Request $request) : Response
+    public function create(PedidosRepository $pedidosRepository, UsuariosRepository $usuariosRepository, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, Request $request) : Response
     {
         try{
 
@@ -72,6 +78,16 @@ class PedidosController extends AbstractController
 
             if($forma_pagamento){
                 if($situacao){
+
+                    $usuario = $usuariosRepository->find($request->get('usuario'));
+
+                    if(!$usuario){
+                        return $this->json(
+                            array("code"=>200,"type"=>"success","message"=>"O usuário não foi informado!"),
+                            400
+                        );
+                    }
+
                     $pedido = new Pedidos;
                     $pedido->setFormaPagamento($forma_pagamento);
                     $pedido->setSituacao($situacao);
@@ -85,6 +101,7 @@ class PedidosController extends AbstractController
                         array("code"=>200,"type"=>"success","message"=>"O pedido foi registrado com sucesso!"),
                         200
                     );
+
                 }else{
 
                 }
@@ -108,7 +125,7 @@ class PedidosController extends AbstractController
     /** 
      * @Route("/pedidos/update", name="app_pedidos_update", methods="PUT")
      */
-    public function update(EntityManagerInterface $em, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, PedidosRepository $pedidosRepository, Request $request) : Response
+    public function update(EntityManagerInterface $em, UsuariosRepository $usuariosRepository, FormaPagamentoRepository $formaPagamentoRepository, SituacaoRepository $situacaoRepository, PedidosRepository $pedidosRepository, Request $request) : Response
     {
         try{
 
@@ -120,6 +137,15 @@ class PedidosController extends AbstractController
             if(!$forma_pagamento){
                 return $this->json(
                     array("code"=>400,"type"=>"error","message"=>"A forma de pagamento é inválida!"),
+                    400
+                );
+            }
+
+            $usuario = $usuariosRepository->find($request->get('usuario'));
+
+            if(!$usuario){
+                return $this->json(
+                    array("code"=>400,"type"=>"error","message"=>"O usuário não foi informado!"),
                     400
                 );
             }
