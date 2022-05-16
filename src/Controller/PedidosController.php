@@ -90,6 +90,7 @@ class PedidosController extends AbstractController
 
                     $pedido = new Pedidos;
                     $pedido->setFormaPagamento($forma_pagamento);
+                    $pedido->setUsuario($usuario);
                     $pedido->setSituacao($situacao);
                     $pedido->setValor($values->valor);
                     $pedido->setRemoved(0);
@@ -169,6 +170,7 @@ class PedidosController extends AbstractController
             }
 
             $pedido->setFormaPagamento($forma_pagamento);
+            $pedido->setUsuario($usuario);
             $pedido->setSituacao($situacao);
             $pedido->setValor($values->valor);
             $pedido->setUpdatedAt(new \DateTime());

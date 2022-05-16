@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Tempo de geração: 15-Maio-2022 às 14:30
+-- Tempo de geração: 16-Maio-2022 às 02:26
 -- Versão do servidor: 10.4.24-MariaDB
 -- versão do PHP: 7.4.26
 
@@ -41,7 +41,8 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20220515104327', '2022-05-15 10:43:42', 734),
 ('DoctrineMigrations\\Version20220515112546', '2022-05-15 11:25:58', 3347),
 ('DoctrineMigrations\\Version20220515132926', '2022-05-15 13:29:39', 230),
-('DoctrineMigrations\\Version20220515140052', '2022-05-15 14:00:59', 972);
+('DoctrineMigrations\\Version20220515140052', '2022-05-15 14:00:59', 972),
+('DoctrineMigrations\\Version20220516021558', '2022-05-16 02:16:12', 873);
 
 -- --------------------------------------------------------
 
@@ -95,20 +96,23 @@ CREATE TABLE `pedidos` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL,
   `forma_pagamento_id` int(11) NOT NULL,
-  `situacao_id` int(11) NOT NULL
+  `situacao_id` int(11) NOT NULL,
+  `usuario_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Extraindo dados da tabela `pedidos`
 --
 
-INSERT INTO `pedidos` (`id`, `valor`, `removed`, `created_at`, `updated_at`, `forma_pagamento_id`, `situacao_id`) VALUES
-(1, '3000.000', 1, '2022-05-15 11:58:04', '2022-05-15 14:02:38', 1, 3),
-(3, '200.000', 0, '2022-05-15 14:01:51', NULL, 1, 1),
-(4, '200.000', 0, '2022-05-15 14:01:56', NULL, 1, 1),
-(5, '200.000', 0, '2022-05-15 14:01:59', NULL, 2, 1),
-(6, '200.000', 0, '2022-05-15 14:02:01', NULL, 2, 3),
-(7, '200.000', 0, '2022-05-15 14:02:03', NULL, 1, 3);
+INSERT INTO `pedidos` (`id`, `valor`, `removed`, `created_at`, `updated_at`, `forma_pagamento_id`, `situacao_id`, `usuario_id`) VALUES
+(1, '3000.000', 1, '2022-05-15 11:58:04', '2022-05-16 02:22:43', 1, 3, 1),
+(3, '3000.000', 0, '2022-05-15 14:01:51', '2022-05-16 02:23:04', 1, 3, 1),
+(4, '3000.000', 0, '2022-05-15 14:01:56', '2022-05-16 02:23:40', 1, 3, 1),
+(5, '3000.000', 0, '2022-05-15 14:01:59', '2022-05-16 02:23:42', 1, 3, 1),
+(6, '3000.000', 0, '2022-05-15 14:02:01', '2022-05-16 02:23:45', 1, 3, 1),
+(7, '3000.000', 0, '2022-05-15 14:02:03', '2022-05-16 02:23:48', 1, 3, 1),
+(8, '3000.000', 0, '2022-05-15 14:32:49', '2022-05-16 02:23:50', 1, 3, 1),
+(9, '3000.000', 0, '2022-05-16 02:21:28', '2022-05-16 02:23:53', 1, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -131,7 +135,8 @@ CREATE TABLE `pedido_itens` (
 INSERT INTO `pedido_itens` (`id`, `produto_id`, `pedido_id`, `valor`, `created_at`) VALUES
 (1, 1, 1, '200.000', '2022-05-15 13:25:19'),
 (2, 1, 1, '200.000', '2022-05-15 13:58:56'),
-(3, 1, 1, '200.000', '2022-05-15 14:02:57');
+(3, 1, 1, '200.000', '2022-05-15 14:02:57'),
+(4, 1, 1, '200.000', '2022-05-15 14:33:45');
 
 -- --------------------------------------------------------
 
@@ -157,7 +162,7 @@ CREATE TABLE `produtos` (
 --
 
 INSERT INTO `produtos` (`id`, `nome`, `codigo_barra`, `valor`, `quantidade`, `descricao`, `peso`, `removed`, `created_at`, `updated_at`) VALUES
-(1, 'TV SAMSUNG 4K HD', 48488448, '1500.000', 0, 'É uma TV Samsung 4K HD', '20.000', 1, '2022-05-15 11:43:34', '2022-05-15 13:32:34'),
+(1, 'TV SAMSUNG 4K HD', 48488448, '1500.000', 0, 'É uma TV Samsung 4K HD', '20.000', 1, '2022-05-15 11:43:34', '2022-05-15 14:32:42'),
 (2, 'TV LG UHD 4K', 959595920, '1000.000', 0, 'É uma tv LG UHD 4K', '20.000', 0, '2022-05-15 13:32:29', NULL);
 
 -- --------------------------------------------------------
@@ -206,7 +211,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nome`, `sobrenome`, `email`, `password`, `removed`, `created_at`, `updated_at`) VALUES
-(1, 'Giovani', 'Patrick', 'giovani@diminua.me', '25d55ad283aa400af464c76d713c07ad', 1, '2022-05-15 11:31:22', '2022-05-15 13:32:20'),
+(1, 'Giovani', 'Patrick', 'giovani@diminua.me', '25d55ad283aa400af464c76d713c07ad', 1, '2022-05-15 11:31:22', '2022-05-15 14:32:30'),
 (2, 'Giovani', 'Patrick', 'giovanipatrick@diminua.me', '25d55ad283aa400af464c76d713c07ad', 0, '2022-05-15 13:32:12', NULL);
 
 --
@@ -240,7 +245,8 @@ ALTER TABLE `messenger_messages`
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_6716CCAA79AFB555` (`forma_pagamento_id`),
-  ADD KEY `IDX_6716CCAA95FC38A6` (`situacao_id`);
+  ADD KEY `IDX_6716CCAA95FC38A6` (`situacao_id`),
+  ADD KEY `IDX_6716CCAADB38439E` (`usuario_id`);
 
 --
 -- Índices para tabela `pedido_itens`
@@ -288,13 +294,13 @@ ALTER TABLE `messenger_messages`
 -- AUTO_INCREMENT de tabela `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de tabela `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de tabela `produtos`
@@ -323,7 +329,8 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `pedidos`
   ADD CONSTRAINT `FK_6716CCAA79AFB555` FOREIGN KEY (`forma_pagamento_id`) REFERENCES `forma_pagamento` (`id`),
-  ADD CONSTRAINT `FK_6716CCAA95FC38A6` FOREIGN KEY (`situacao_id`) REFERENCES `situacao` (`id`);
+  ADD CONSTRAINT `FK_6716CCAA95FC38A6` FOREIGN KEY (`situacao_id`) REFERENCES `situacao` (`id`),
+  ADD CONSTRAINT `FK_6716CCAADB38439E` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Limitadores para a tabela `pedido_itens`

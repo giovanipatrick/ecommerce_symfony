@@ -46,7 +46,8 @@ class PedidosRepository extends ServiceEntityRepository
        $sql = 'SELECT 
        p.*, 
        f.nome AS forma_pagamento, 
-       s.nome AS situacao
+       s.nome AS situacao,
+       CONCAT(u.nome," ",u.sobrenome) AS usuario
      FROM 
        pedidos AS p 
        INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
@@ -72,7 +73,8 @@ class PedidosRepository extends ServiceEntityRepository
        $sql = "SELECT 
        p.*, 
        f.nome AS forma_pagamento, 
-       s.nome AS situacao 
+       s.nome AS situacao, 
+       CONCAT(u.nome,' ',u.sobrenome) AS usuario
      FROM 
        pedidos AS p 
        INNER JOIN forma_pagamento AS f ON(p.forma_pagamento_id = f.id) 
